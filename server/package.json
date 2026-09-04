@@ -1,0 +1,20 @@
+{
+  "name": "freight-forecast-server",
+  "version": "1.0.0",
+  "description": "Intelligent Freight Forecasting Backend - SIH 2026 PS 26006",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/data/seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.14.1"
+  }
+}
