@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { generateHistoricalBDI, generateForecast, generateSHAPExplanation } from '../data/freightData.js';
+import { generateHistoricalBDI, generateForecast, generateSHAPExplanation, getModelInfo } from '../data/freightData.js';
 import { indianPorts, originPorts, routeDistances } from '../data/ports.js';
 import { vesselTypes } from '../data/vessels.js';
 
@@ -253,6 +253,11 @@ router.get('/contract-comparison', (req, res) => {
       recommendation: `Based on current market analysis, a ${vessel.name} Medium-Term Charter saves $${medTermSavings.toLocaleString()} over 6 months compared to spot contracts. For SAIL's 16.3M annual tonnage, COA provides the highest cost efficiency.`,
     },
   });
+});
+
+// GET /api/forecast/model-info — ML pipeline information
+router.get('/model-info', (req, res) => {
+  res.json({ success: true, data: getModelInfo() });
 });
 
 export default router;

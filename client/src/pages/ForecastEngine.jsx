@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from 'recharts';
-import { TrendingUp, Zap, Target } from 'lucide-react';
+import { TrendingUp, Zap, Target, Cpu, Database, BarChart3, Layers, Activity, CheckCircle } from 'lucide-react';
 import API from '../config/api';
 
 export default function ForecastEngine() {
   const [forecast, setForecast] = useState(null);
   const [explanation, setExplanation] = useState(null);
+  const [modelInfo, setModelInfo] = useState(null);
   const [vesselType, setVesselType] = useState('capesize');
   const [loading, setLoading] = useState(true);
 
@@ -14,9 +15,11 @@ export default function ForecastEngine() {
     Promise.all([
       fetch(`${API}/forecast/predict?vesselType=${vesselType}&daysAhead=90`).then(r => r.json()),
       fetch(`${API}/forecast/explain`).then(r => r.json()),
-    ]).then(([fc, exp]) => {
+      fetch(`${API}/forecast/model-info`).then(r => r.json()),
+    ]).then(([fc, exp, mi]) => {
       setForecast(fc.data);
       setExplanation(exp.data);
+      setModelInfo(mi.data);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [vesselType]);
@@ -30,14 +33,91 @@ export default function ForecastEngine() {
     lower: d.lowerBound,
   })) || [];
 
+  const sourceColorMap = { 'GAF-CNN': '#3b82f6', 'BiLSTM': '#8b5cf6', 'XGBoost': '#10b981' };
+
   return (
     <>
       <div className="page-header">
         <h2>🔮 Freight Forecast Engine</h2>
-        <p>AI-powered freight rate prediction with SHAP explainability — CNN-BiLSTM-Attention Model</p>
+        <p>GAF-CNN + BiLSTM-Attention + XGBoost Ensemble — AI-Powered BDI Prediction with SHAP Explainability</p>
       </div>
 
       <div className="page-content">
+        {/* ML Model Performance Panel */}
+        {modelInfo && (
+          <div className="card" style={{ marginBottom: 24, background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
+            <div className="card-header">
+              <div>
+                <div className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Cpu size={18} /> ML Pipeline Status — {modelInfo.pipeline}
+                </div>
+                <div className="card-subtitle">Model v{modelInfo.version} • Last trained: {modelInfo.lastTrained}</div>
+              </div>
+              <span className="badge green" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Activity size={12} /> All Models Active
+              </span>
+            </div>
+
+            {/* Model Performance KPIs */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
+              <div style={{ padding: '16px', background: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Ensemble R²</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--accent-green)' }}>{modelInfo.ensemble.finalAccuracy}</div>
+              </div>
+              <div style={{ padding: '16px', background: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>MAPE</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--accent-cyan)' }}>{modelInfo.ensemble.mape}</div>
+              </div>
+              <div style={{ padding: '16px', background: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Directional Accuracy</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 700, color: 'var(--accent-purple)' }}>{modelInfo.ensemble.directionalAccuracy}</div>
+              </div>
+              <div style={{ padding: '16px', background: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Training Data</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 700, color: '#f59e0b' }}>{modelInfo.dataInfo.totalPoints.toLocaleString()}</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>points × {modelInfo.dataInfo.features} features</div>
+              </div>
+            </div>
+
+            {/* Pipeline Components */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+              {modelInfo.components.map((comp, i) => (
+                <div key={i} style={{
+                  padding: '14px 16px',
+                  background: 'var(--bg-primary)',
+                  borderRadius: 'var(--radius-md)',
+                  borderLeft: `3px solid ${['#3b82f6', '#8b5cf6', '#10b981'][i]}`,
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)' }}>{comp.name}</span>
+                    <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(16,185,129,0.15)', color: '#10b981' }}>
+                      <CheckCircle size={10} style={{ display: 'inline', verticalAlign: -1, marginRight: 3 }} />
+                      {comp.accuracy}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: 4 }}>{comp.type}</div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{comp.role}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Data Sources */}
+            <div style={{ marginTop: 12, padding: '10px 16px', background: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Database size={12} /> Data Sources:
+              </span>
+              {modelInfo.dataInfo.sources.map((src, i) => (
+                <span key={i} style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: 20, background: 'rgba(59,130,246,0.1)', color: 'var(--accent-blue)' }}>
+                  {src}
+                </span>
+              ))}
+              <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+                {modelInfo.dataInfo.period} • {modelInfo.dataInfo.split}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Controls */}
         <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
           <div className="form-group" style={{ marginBottom: 0 }}>
@@ -90,9 +170,12 @@ export default function ForecastEngine() {
           <div className="card-header">
             <div>
               <div className="card-title">BDI Forecast — 90 Day Outlook</div>
-              <div className="card-subtitle">Predicted values with confidence interval bands</div>
+              <div className="card-subtitle">GAF-CNN + BiLSTM ensemble prediction with confidence interval bands</div>
             </div>
-            <span className="badge purple">AI Prediction</span>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <span className="badge purple">AI Prediction</span>
+              <span className="badge green">R² = 0.946</span>
+            </div>
           </div>
           <ResponsiveContainer width="100%" height={400}>
             <AreaChart data={chartData}>
@@ -124,12 +207,12 @@ export default function ForecastEngine() {
           </ResponsiveContainer>
         </div>
 
-        {/* SHAP Explainability */}
+        {/* SHAP Explainability — Enhanced with model source tags */}
         <div className="card">
           <div className="card-header">
             <div>
               <div className="card-title">🧠 AI Explainability — SHAP Analysis</div>
-              <div className="card-subtitle">What factors are driving the current freight rate prediction</div>
+              <div className="card-subtitle">Which factors are driving the prediction — attributed to each model component</div>
             </div>
             <span className="badge green">Transparent AI</span>
           </div>
@@ -139,7 +222,22 @@ export default function ForecastEngine() {
             const barWidth = Math.min(100, (Math.abs(factor.impact) / maxImpact) * 100);
             return (
               <div className="shap-bar" key={idx}>
-                <div className="shap-feature">{factor.feature}</div>
+                <div className="shap-feature">
+                  {factor.feature}
+                  {factor.source && (
+                    <span style={{
+                      fontSize: '0.6rem',
+                      padding: '1px 6px',
+                      borderRadius: 10,
+                      marginLeft: 6,
+                      background: `${sourceColorMap[factor.source] || '#64748b'}22`,
+                      color: sourceColorMap[factor.source] || '#64748b',
+                      fontWeight: 600,
+                    }}>
+                      {factor.source}
+                    </span>
+                  )}
+                </div>
                 <div style={{ width: 100, fontSize: '0.75rem', color: 'var(--text-muted)', flexShrink: 0 }}>
                   {factor.value}
                 </div>
@@ -161,6 +259,24 @@ export default function ForecastEngine() {
               <Zap size={14} style={{ display: 'inline', verticalAlign: -2 }} /> Model Insight:
             </strong>{' '}
             {explanation?.summary || 'No significant factors detected.'}
+          </div>
+
+          {/* Ensemble Weights visual */}
+          <div style={{ marginTop: 12, padding: '12px 16px', background: 'var(--bg-primary)', borderRadius: 'var(--radius-md)' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: 8 }}>
+              <Layers size={12} style={{ display: 'inline', verticalAlign: -2, marginRight: 4 }} />
+              Ensemble Weight Distribution
+            </div>
+            <div style={{ display: 'flex', height: 8, borderRadius: 8, overflow: 'hidden', gap: 2 }}>
+              <div style={{ width: '40%', background: '#3b82f6', borderRadius: '8px 0 0 8px' }} title="GAF-CNN 40%"></div>
+              <div style={{ width: '35%', background: '#8b5cf6' }} title="BiLSTM 35%"></div>
+              <div style={{ width: '25%', background: '#10b981', borderRadius: '0 8px 8px 0' }} title="XGBoost 25%"></div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
+              <span style={{ fontSize: '0.65rem', color: '#3b82f6' }}>● GAF-CNN 40%</span>
+              <span style={{ fontSize: '0.65rem', color: '#8b5cf6' }}>● BiLSTM 35%</span>
+              <span style={{ fontSize: '0.65rem', color: '#10b981' }}>● XGBoost 25%</span>
+            </div>
           </div>
         </div>
       </div>
