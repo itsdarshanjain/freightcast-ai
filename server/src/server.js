@@ -10,6 +10,8 @@ import portRoutes from './routes/ports.js';
 import forecastRoutes from './routes/forecast.js';
 import vesselRoutes from './routes/vessels.js';
 import alertRoutes from './routes/alerts.js';
+import captainRoutes from './routes/captain.js';
+import scenariosRoutes from './routes/scenarios.js';
 
 dotenv.config();
 
@@ -30,6 +32,8 @@ app.use('/api/ports', portRoutes);
 app.use('/api/forecast', forecastRoutes);
 app.use('/api/vessels', vesselRoutes);
 app.use('/api/alerts', alertRoutes);
+app.use('/api/captain', captainRoutes);
+app.use('/api/scenarios', scenariosRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

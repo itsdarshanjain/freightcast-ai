@@ -31,7 +31,7 @@ export default function PortIntelligence() {
   return (
     <>
       <div className="page-header">
-        <h2>🗺️ Port Intelligence</h2>
+        <h2><MapPin size={28} className="header-icon" /> Port Intelligence</h2>
         <p>East Coast India port specifications, vessel compatibility, and congestion monitoring</p>
       </div>
 

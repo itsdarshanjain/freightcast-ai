@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { TrendingUp, TrendingDown, Activity, Ship, Anchor, AlertTriangle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity, Ship, Anchor, AlertTriangle, LayoutDashboard } from 'lucide-react';
 import TradeMap from '../components/TradeMap';
 import API from '../config/api';
 
@@ -42,7 +42,7 @@ export default function Dashboard() {
   return (
     <>
       <div className="page-header">
-        <h2>📊 Overview Dashboard</h2>
+        <h2><LayoutDashboard size={28} className="header-icon" /> Overview Dashboard</h2>
         <p>Real-time freight market intelligence for SAIL's East Coast coal procurement</p>
       </div>
 
@@ -212,6 +212,46 @@ export default function Dashboard() {
             <span className="badge blue">Interactive</span>
           </div>
           <TradeMap />
+        </div>
+
+        {/* CAG Compliance + Quick Actions */}
+        <div className="charts-grid" style={{ marginTop: 24 }}>
+          <div className="cag-alert">
+            <div className="cag-title">📋 CAG Report No. 10 of 2025 — SAIL Audit Finding</div>
+            <div className="cag-stat">₹2,539 Crore</div>
+            <div className="cag-desc">
+              Excess expenditure on imported coal at SAIL (2016-2023). Root cause: no predictive model for procurement timing.
+              Additionally, <strong>9.32 lakh tonnes of hot metal production lost</strong> (₹1,231 Cr potential revenue) due to inventory management failure.
+              <br /><br />
+              <span style={{ color: 'var(--accent-green)', fontWeight: 600 }}>
+                FreightCast AI directly addresses these CAG findings with ML-based freight forecasting, COA contract optimization, and real-time risk alerting.
+              </span>
+            </div>
+          </div>
+
+          <div className="card">
+            <div className="card-header">
+              <div className="card-title">⚡ Quick Actions</div>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <a href="/forecast" style={{ textDecoration: 'none', padding: '12px 16px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem' }}>
+                <span>📈 BDI 90-Day Forecast</span>
+                <span className="badge blue">Best Entry Window</span>
+              </a>
+              <a href="/vessel" style={{ textDecoration: 'none', padding: '12px 16px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem' }}>
+                <span>🚢 Optimize Vessel Selection</span>
+                <span className="badge green">CII Rating</span>
+              </a>
+              <a href="/simulator" style={{ textDecoration: 'none', padding: '12px 16px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem' }}>
+                <span>🔮 What-If Simulator</span>
+                <span className="badge red">Red Sea Active</span>
+              </a>
+              <a href="/contracts" style={{ textDecoration: 'none', padding: '12px 16px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.82rem' }}>
+                <span>📋 COA Strategy Advisor</span>
+                <span className="badge amber">₹520Cr Savings</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </>

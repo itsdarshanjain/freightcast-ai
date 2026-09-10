@@ -39,7 +39,7 @@ export default function ContractPlanner() {
   return (
     <>
       <div className="page-header">
-        <h2>📋 Contract Planner</h2>
+        <h2><FileText size={28} className="header-icon" /> Contract Planner</h2>
         <p>Compare Spot vs Short-term vs Medium-term vs COA — the PS objective: move from spot to multi-voyage contracts</p>
       </div>
 

@@ -45,7 +45,7 @@ export default function VesselOptimizer() {
   return (
     <>
       <div className="page-header">
-        <h2>🚢 Vessel Optimizer</h2>
+        <h2><Ship size={28} className="header-icon" /> Vessel Optimizer</h2>
         <p>Find the optimal vessel type considering cargo volume, port constraints, and voyage economics</p>
       </div>
 
