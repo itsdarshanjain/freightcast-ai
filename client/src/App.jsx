@@ -129,9 +129,14 @@ function App() {
             </div>
 
             {/* Live BDI Indicator */}
-            <div className="sidebar-live">
-              <span className="live-dot"></span>
-              LIVE — BDI 3,628
+            <div className="sidebar-live" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div>
+                <span className="live-dot"></span>
+                LIVE — BDI 3,628
+              </div>
+              <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '4px', fontWeight: 400 }}>
+                Updated: {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+              </div>
             </div>
 
             <nav className="sidebar-nav">

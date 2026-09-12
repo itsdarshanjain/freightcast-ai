@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { TrendingUp, TrendingDown, Activity, Ship, Anchor, AlertTriangle, LayoutDashboard } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity, Ship, Anchor, AlertTriangle, LayoutDashboard, Download } from 'lucide-react';
 import TradeMap from '../components/TradeMap';
 import API from '../config/api';
 import { useCurrency } from '../context/CurrencyContext';
@@ -43,9 +43,15 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="page-header">
-        <h2><LayoutDashboard size={28} className="header-icon" /> Overview Dashboard</h2>
-        <p>Real-time freight market intelligence for SAIL's East Coast coal procurement</p>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h2><LayoutDashboard size={28} className="header-icon" /> Overview Dashboard</h2>
+          <p>Real-time freight market intelligence for SAIL's East Coast coal procurement</p>
+        </div>
+        <button onClick={() => window.print()} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 16px', background: 'var(--accent-blue)', color: '#fff', border: 'none', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}>
+          <Download size={16} />
+          Export Report
+        </button>
       </div>
 
       <div className="page-content">
