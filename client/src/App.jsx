@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
-import { Anchor, LayoutDashboard, Ship, MapPin, AlertTriangle, FileText, TrendingUp, Navigation, Compass, X, Send, Moon, Sun } from 'lucide-react';
+import { Anchor, LayoutDashboard, Ship, MapPin, AlertTriangle, FileText, TrendingUp, Navigation, Compass, X, Send, Moon, Sun, DollarSign } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import ForecastEngine from './pages/ForecastEngine';
 import VesselOptimizer from './pages/VesselOptimizer';
@@ -9,6 +9,7 @@ import RiskAlerts from './pages/RiskAlerts';
 import ContractPlanner from './pages/ContractPlanner';
 import RoutePlanner from './pages/RoutePlanner';
 import WhatIfSimulator from './pages/WhatIfSimulator';
+import { CurrencyProvider, useCurrency } from './context/CurrencyContext';
 import './App.css';
 
 const API = import.meta.env.DEV ? 'http://localhost:5000/api' : '/api';
@@ -23,6 +24,48 @@ const navItems = [
   { path: '/simulator', icon: <Compass size={18} />, label: 'What-If Simulator' },
   { path: '/routes', icon: <Navigation size={18} />, label: 'Route Planner' },
 ];
+
+function SidebarControls({ theme, toggleTheme }) {
+  const { currency, setCurrency, rate } = useCurrency();
+  
+  return (
+    <div className="sidebar-footer">
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+        <button 
+          onClick={toggleTheme} 
+          style={{
+            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            padding: '10px', background: 'transparent', border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-md)', color: 'var(--text-secondary)', cursor: 'pointer',
+            fontSize: '0.85rem'
+          }}
+        >
+          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+        <button 
+          onClick={() => setCurrency(currency === 'USD' ? 'INR' : 'USD')}
+          title={`Live Rate: ₹${rate.toFixed(2)}`}
+          style={{
+            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            padding: '10px', background: currency === 'INR' ? 'rgba(52, 211, 153, 0.15)' : 'transparent',
+            border: `1px solid ${currency === 'INR' ? 'var(--accent-green)' : 'var(--border-color)'}`,
+            borderRadius: 'var(--radius-md)', color: currency === 'INR' ? 'var(--accent-green)' : 'var(--text-secondary)', 
+            cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600
+          }}
+        >
+          {currency === 'USD' ? 'USD' : 'INR'}
+        </button>
+      </div>
+      <div className="user-info">
+        <div className="user-avatar">LM</div>
+        <div>
+          <div className="user-name">Logistics Manager</div>
+          <div className="user-role">SAIL — CCSO Dhanbad</div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
@@ -68,73 +111,54 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <div className="app-layout">
-        {/* Sidebar */}
-        <aside className="sidebar">
-          <div className="sidebar-header">
-            <div className="sidebar-logo">
-              <div className="sidebar-logo-icon">
-                <Anchor size={22} color="white" />
+    <CurrencyProvider>
+      <BrowserRouter>
+        <div className="app-layout">
+          {/* Sidebar */}
+          <aside className="sidebar">
+            <div className="sidebar-header">
+              <div className="sidebar-logo">
+                <div className="sidebar-logo-icon">
+                  <Anchor size={22} color="white" />
+                </div>
+                <div>
+                  <h1>FreightCast AI</h1>
+                  <span>SAIL Freight Intelligence</span>
+                </div>
               </div>
+            </div>
+
+            {/* Live BDI Indicator */}
+            <div className="sidebar-live">
+              <span className="live-dot"></span>
+              LIVE — BDI 3,628
+            </div>
+
+            <nav className="sidebar-nav">
+              {navItems.map(item => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  end={item.path === '/'}
+                  className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  <span>{item.label}</span>
+                </NavLink>
+              ))}
+            </nav>
+
+            {/* Captain AI Button */}
+            <button className="captain-btn" onClick={() => setCaptainOpen(true)}>
+              <span className="captain-btn-icon">🧠</span>
               <div>
-                <h1>FreightCast AI</h1>
-                <span>SAIL Freight Intelligence</span>
+                <div style={{ fontWeight: 700, fontSize: '0.82rem' }}>Captain AI</div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontWeight: 400 }}>SAIL Domain Expert</div>
               </div>
-            </div>
-          </div>
-
-          {/* Live BDI Indicator */}
-          <div className="sidebar-live">
-            <span className="live-dot"></span>
-            LIVE — BDI 3,628
-          </div>
-
-          <nav className="sidebar-nav">
-            {navItems.map(item => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.path === '/'}
-                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-              >
-                <span className="nav-icon">{item.icon}</span>
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
-          </nav>
-
-          {/* Captain AI Button */}
-          <button className="captain-btn" onClick={() => setCaptainOpen(true)}>
-            <span className="captain-btn-icon">🧠</span>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: '0.82rem' }}>Captain AI</div>
-              <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontWeight: 400 }}>SAIL Domain Expert</div>
-            </div>
-          </button>
-
-          <div className="sidebar-footer">
-            <button 
-              onClick={toggleTheme} 
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
-                padding: '10px 14px', background: 'transparent', border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)', color: 'var(--text-secondary)', cursor: 'pointer',
-                marginBottom: '16px', fontSize: '0.85rem'
-              }}
-            >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-              <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
             </button>
-            <div className="user-info">
-              <div className="user-avatar">LM</div>
-              <div>
-                <div className="user-name">Logistics Manager</div>
-                <div className="user-role">SAIL — CCSO Dhanbad</div>
-              </div>
-            </div>
-          </div>
-        </aside>
+
+            <SidebarControls theme={theme} toggleTheme={toggleTheme} />
+          </aside>
 
         {/* Main Content */}
         <main className="main-content">
@@ -222,6 +246,7 @@ function App() {
         {captainOpen && <div className="captain-overlay" onClick={() => setCaptainOpen(false)} />}
       </div>
     </BrowserRouter>
+    </CurrencyProvider>
   );
 }
 

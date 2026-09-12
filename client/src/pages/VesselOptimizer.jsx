@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Ship, Check, X, DollarSign } from 'lucide-react';
 import API from '../config/api';
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function VesselOptimizer() {
   const [origins, setOrigins] = useState([]);
@@ -10,6 +11,7 @@ export default function VesselOptimizer() {
   const [cargoVolume, setCargoVolume] = useState(100000);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { formatCurrency } = useCurrency();
 
   useEffect(() => {
     Promise.all([
@@ -108,7 +110,9 @@ export default function VesselOptimizer() {
                   <div className="card-title" style={{ color: 'var(--accent-green)' }}>⭐ Recommended: {result.bestRecommendation.vesselType}</div>
                   <span className="badge green">Best Option</span>
                 </div>
-                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>{result.bestRecommendation.reason}</p>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
+                  {result.bestRecommendation.reason.replace(/\$[0-9.]+/, formatCurrency(result.bestRecommendation.costPerTon))}
+                </p>
               </div>
             )}
 
@@ -133,8 +137,8 @@ export default function VesselOptimizer() {
                   {option.compatible ? (
                     <>
                       <div className="vessel-cost">
-                        <DollarSign size={20} style={{ display: 'inline', verticalAlign: -3 }} />
-                        {option.costPerTon}/ton
+                        {formatCurrency(option.costPerTon)}
+                        <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>/ton</span>
                       </div>
 
                       <table style={{ width: '100%', fontSize: '0.78rem' }}>
@@ -153,15 +157,15 @@ export default function VesselOptimizer() {
                           </tr>
                           <tr>
                             <td style={{ color: 'var(--text-muted)', padding: '4px 0' }}>Charter/Voyage</td>
-                            <td style={{ textAlign: 'right', fontWeight: 600 }}>${option.costBreakdown?.charterCost?.toLocaleString()}</td>
+                            <td style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(option.costBreakdown?.charterCost)}</td>
                           </tr>
                           <tr>
                             <td style={{ color: 'var(--text-muted)', padding: '4px 0' }}>Fuel/Voyage</td>
-                            <td style={{ textAlign: 'right', fontWeight: 600 }}>${option.costBreakdown?.fuelCost?.toLocaleString()}</td>
+                            <td style={{ textAlign: 'right', fontWeight: 600 }}>{formatCurrency(option.costBreakdown?.fuelCost)}</td>
                           </tr>
                           <tr style={{ borderTop: '1px solid var(--border-color)' }}>
                             <td style={{ color: 'var(--accent-cyan)', padding: '6px 0', fontWeight: 600 }}>Total Cost</td>
-                            <td style={{ textAlign: 'right', fontWeight: 800, color: 'var(--accent-cyan)' }}>${option.totalCost?.toLocaleString()}</td>
+                            <td style={{ textAlign: 'right', fontWeight: 800, color: 'var(--accent-cyan)' }}>{formatCurrency(option.totalCost)}</td>
                           </tr>
                         </tbody>
                       </table>

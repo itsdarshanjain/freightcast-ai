@@ -3,6 +3,7 @@ import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
 import { TrendingUp, TrendingDown, Activity, Ship, Anchor, AlertTriangle, LayoutDashboard } from 'lucide-react';
 import TradeMap from '../components/TradeMap';
 import API from '../config/api';
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function Dashboard() {
   const [currentData, setCurrentData] = useState(null);
@@ -10,6 +11,7 @@ export default function Dashboard() {
   const [alerts, setAlerts] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { formatCurrency } = useCurrency();
 
   useEffect(() => {
     Promise.all([
@@ -68,7 +70,7 @@ export default function Dashboard() {
 
           <div className="kpi-card green">
             <div className="kpi-label">Capesize Rate</div>
-            <div className="kpi-value">${currentData?.rates?.capesize?.toLocaleString() || '—'}<span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>/day</span></div>
+            <div className="kpi-value">{currentData?.rates?.capesize ? formatCurrency(currentData.rates.capesize) : '—'}<span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>/day</span></div>
             <div className="kpi-change" style={{ color: 'var(--text-muted)' }}>
               TCE — Australia→Paradip route
             </div>
@@ -85,7 +87,7 @@ export default function Dashboard() {
 
           <div className="kpi-card purple">
             <div className="kpi-label">Coal Price (Newcastle)</div>
-            <div className="kpi-value">${currentData?.indicators?.coalPrice || '—'}<span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>/ton</span></div>
+            <div className="kpi-value">{currentData?.indicators?.coalPrice ? formatCurrency(currentData.indicators.coalPrice) : '—'}<span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>/ton</span></div>
             <div className="kpi-change" style={{ color: 'var(--text-muted)' }}>
               Benchmark coking coal
             </div>
@@ -174,8 +176,8 @@ export default function Dashboard() {
           </div>
 
           <div className="card">
-            <div className="card-header">
-              <div className="card-title">🚢 Current Charter Rates ($/day)</div>
+            <div className="card-header" style={{ padding: '16px', borderBottom: '1px solid var(--border-color)' }}>
+              <div className="card-title"><Ship size={16} style={{ display: 'inline', verticalAlign: -3, marginRight: 6 }} /> Current Charter Rates</div>
             </div>
             <table className="data-table">
               <thead>
@@ -190,7 +192,7 @@ export default function Dashboard() {
                   <tr key={type}>
                     <td style={{ fontWeight: 600, textTransform: 'capitalize' }}>{type}</td>
                     <td style={{ fontWeight: 700, color: 'var(--accent-cyan)' }}>
-                      ${currentData?.rates?.[type]?.toLocaleString()}
+                      {currentData?.rates?.[type] ? formatCurrency(currentData.rates[type]) : '—'}<span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>/day</span>
                     </td>
                     <td style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
                       Year high/low

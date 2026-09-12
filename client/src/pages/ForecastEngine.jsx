@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine } from 'recharts';
 import { TrendingUp, Zap, Target, Cpu, Database, BarChart3, Layers, Activity, CheckCircle } from 'lucide-react';
 import API from '../config/api';
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function ForecastEngine() {
   const [forecast, setForecast] = useState(null);
@@ -9,6 +10,7 @@ export default function ForecastEngine() {
   const [modelInfo, setModelInfo] = useState(null);
   const [vesselType, setVesselType] = useState('capesize');
   const [loading, setLoading] = useState(true);
+  const { formatCurrency } = useCurrency();
 
   useEffect(() => {
     setLoading(true);
@@ -75,14 +77,14 @@ export default function ForecastEngine() {
             </div>
             <div className="kpi-card purple">
               <div className="kpi-label">Estimated Rate</div>
-              <div className="kpi-value">${forecast.bestEntryWindow.estimatedRate?.toLocaleString()}<span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>/day</span></div>
+              <div className="kpi-value">{forecast.bestEntryWindow.estimatedRate ? formatCurrency(forecast.bestEntryWindow.estimatedRate) : '—'}<span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>/day</span></div>
               <div className="kpi-change" style={{ color: 'var(--text-secondary)' }}>
                 {vesselType} TCE
               </div>
             </div>
             <div className="kpi-card green">
               <div className="kpi-label">Savings vs Today</div>
-              <div className="kpi-value">${Math.abs(forecast.bestEntryWindow.savingsVsToday)?.toLocaleString()}</div>
+              <div className="kpi-value">{forecast.bestEntryWindow.savingsVsToday ? formatCurrency(Math.abs(forecast.bestEntryWindow.savingsVsToday)) : '—'}</div>
               <div className="kpi-change positive">
                 <TrendingUp size={14} /> Per day savings
               </div>
@@ -164,7 +166,9 @@ export default function ForecastEngine() {
                   )}
                 </div>
                 <div style={{ width: 100, fontSize: '0.75rem', color: 'var(--text-secondary)', flexShrink: 0 }}>
-                  {factor.value}
+                  {factor.value?.startsWith('$') 
+                    ? `${formatCurrency(parseFloat(factor.value.replace(/[^0-9.]/g, '')))}/${factor.value.split('/')[1] || ''}` 
+                    : factor.value}
                 </div>
                 <div className="shap-impact-bar">
                   <div

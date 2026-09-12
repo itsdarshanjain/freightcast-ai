@@ -14,7 +14,8 @@ export default function PortIntelligence() {
       .then(data => {
         setPorts(data.data || []);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   const handlePortSelect = (port) => {

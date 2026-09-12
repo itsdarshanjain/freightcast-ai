@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Compass, Zap, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Compass, Zap, AlertTriangle, ChevronRight, Play, Save, Check, TrendingUp, TrendingDown, RefreshCw, BarChart2, Calendar } from 'lucide-react';
 import API from '../config/api';
+import { useCurrency } from '../context/CurrencyContext';
 
 export default function WhatIfSimulator() {
   const [scenarios, setScenarios] = useState([]);
@@ -8,6 +9,8 @@ export default function WhatIfSimulator() {
   const [result, setResult] = useState(null);
   const [simulating, setSimulating] = useState(false);
   const [demurrage, setDemurrage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const { formatCurrency, currency } = useCurrency();
   const [demPort, setDemPort] = useState('paradip');
   const [demVessel, setDemVessel] = useState('panamax');
   const [demSeason, setDemSeason] = useState('normal');
@@ -109,8 +112,8 @@ export default function WhatIfSimulator() {
                   {Object.entries(result.scenario?.impact || {}).filter(([k]) =>
                     !['recommendation', 'safeRoutes', 'affectedRoutes', 'panamax_advice', 'capesize_advantage', 'contractMix', 'cagNote'].includes(k)
                   ).slice(0, 6).map(([key, value]) => (
-                    <div key={key} className="kpi-card blue" style={{ padding: 12 }}>
-                      <div className="kpi-label" style={{ fontSize: '0.65rem' }}>{key.replace(/([A-Z])/g, ' $1').replace(/USD/g, '($)').trim()}</div>
+                    <div key={key} className={`kpi-card ${Number(value) > 10 ? 'red' : 'green'}`} style={{ padding: '12px' }}>
+                      <div className="kpi-label" style={{ fontSize: '0.65rem' }}>{key.replace(/([A-Z])/g, ' $1').replace(/USD/g, `(${currency})`).trim()}</div>
                       <div className="kpi-value" style={{ fontSize: '1.1rem' }}>
                         {typeof value === 'number' ? value.toLocaleString() : String(value)}
                       </div>
@@ -189,15 +192,15 @@ export default function WhatIfSimulator() {
                 <div className="kpi-value">{demurrage.probabilityPct}%</div>
                 <div className="kpi-change" style={{ color: 'var(--text-muted)' }}>{demurrage.avgExcessDays} excess days avg</div>
               </div>
-              <div className="kpi-card amber">
-                <div className="kpi-label">P50 Cost (Expected)</div>
-                <div className="kpi-value">${demurrage.p50CostUSD?.toLocaleString()}</div>
-                <div className="kpi-change" style={{ color: 'var(--text-muted)' }}>Median estimate</div>
+              <div className={`kpi-card ${demurrage.probabilityPct > 50 ? 'red' : demurrage.probabilityPct > 30 ? 'amber' : 'green'}`}>
+                <div className="kpi-label">P50 Expected Demurrage</div>
+                <div className="kpi-value">{formatCurrency(demurrage.p50CostUSD)}</div>
+                <div className="kpi-change" style={{ color: 'var(--text-muted)' }}>Median scenario</div>
               </div>
-              <div className="kpi-card red">
-                <div className="kpi-label">P90 Cost (Worst Case)</div>
-                <div className="kpi-value">${demurrage.p90CostUSD?.toLocaleString()}</div>
-                <div className="kpi-change" style={{ color: 'var(--text-muted)' }}>${demurrage.dailyDemurrageRate?.toLocaleString()}/day rate</div>
+              <div className={`kpi-card ${demurrage.probabilityPct > 50 ? 'red' : demurrage.probabilityPct > 30 ? 'amber' : 'green'}`}>
+                <div className="kpi-label">P90 Risk Exposure</div>
+                <div className="kpi-value">{formatCurrency(demurrage.p90CostUSD)}</div>
+                <div className="kpi-change" style={{ color: 'var(--text-muted)' }}>{formatCurrency(demurrage.dailyDemurrageRate, true)} rate</div>
               </div>
             </div>
           )}
