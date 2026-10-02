@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Anchor, Ship, AlertTriangle } from 'lucide-react';
+import { MapPin, Ship, AlertTriangle } from 'lucide-react';
 import API from '../config/api';
 
 export default function PortIntelligence() {
@@ -14,7 +14,8 @@ export default function PortIntelligence() {
       .then(data => {
         setPorts(data.data || []);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   const handlePortSelect = (port) => {
@@ -31,7 +32,7 @@ export default function PortIntelligence() {
   return (
     <>
       <div className="page-header">
-        <h2>🗺️ Port Intelligence</h2>
+        <h2><MapPin size={28} className="header-icon" /> Port Intelligence</h2>
         <p>East Coast India port specifications, vessel compatibility, and congestion monitoring</p>
       </div>
 
@@ -163,6 +164,38 @@ export default function PortIntelligence() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+
+        {/* SAIL Plant-Port Mapping */}
+        <div className="card" style={{ marginTop: 24, borderColor: 'var(--accent-purple)', background: 'linear-gradient(145deg, rgba(139,92,246,0.03), var(--bg-card))' }}>
+          <div className="card-header">
+            <div>
+              <div className="card-title">🏭 SAIL Plant → Port Mapping — Optimal Logistics</div>
+              <div className="card-subtitle">Each SAIL integrated steel plant mapped to its nearest East Coast port with rail distance</div>
+            </div>
+            <span className="badge purple">Domain Intel</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
+            {[
+              { plant: 'Rourkela', state: 'Odisha', port: 'Paradip', distance: '342 km', status: 'Optimal', color: 'green' },
+              { plant: 'Bokaro', state: 'Jharkhand', port: 'Paradip', distance: '500 km', status: 'Optimal', color: 'green' },
+              { plant: 'Bhilai', state: 'Chhattisgarh', port: 'Vizag/Gangavaram', distance: '800 km', status: 'Long Rail', color: 'amber' },
+              { plant: 'Durgapur', state: 'West Bengal', port: 'Haldia', distance: '250 km', status: 'Draft Limited', color: 'red' },
+              { plant: 'Burnpur/IISCO', state: 'West Bengal', port: 'Haldia', distance: '200 km', status: 'Draft Limited', color: 'red' },
+            ].map((p, i) => (
+              <div key={i} style={{ padding: 14, background: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', textAlign: 'center', border: '1px solid var(--border-color)' }}>
+                <div style={{ fontSize: '1.2rem', marginBottom: 4 }}>🏭</div>
+                <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>{p.plant}</div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginBottom: 8 }}>{p.state}</div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '4px 0' }}>↓ {p.distance}</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-cyan)' }}>⚓ {p.port}</div>
+                <span className={`badge ${p.color}`} style={{ marginTop: 6, fontSize: '0.6rem' }}>{p.status}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 12, fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.5, fontStyle: 'italic', padding: '8px 12px', background: 'var(--bg-primary)', borderRadius: 'var(--radius-md)' }}>
+            💡 Durgapur & Burnpur: Haldia port has only 10.5m draft (Handysize only). Consider Paradip (342-450 km) for Panamax/Capesize shipments to save 40% on per-ton freight despite longer rail distance. CCSO Dhanbad should coordinate dual-port strategy.
           </div>
         </div>
       </div>

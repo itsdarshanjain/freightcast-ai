@@ -43,7 +43,7 @@ export default function RiskAlerts() {
   return (
     <>
       <div className="page-header">
-        <h2>⚠️ Risk & Alerts</h2>
+        <h2><AlertTriangle size={28} className="header-icon" /> Risk & Alerts</h2>
         <p>Real-time market volatility warnings, port congestion, weather disruptions, and demurrage risks</p>
       </div>
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Navigation, Clock, Fuel, DollarSign, ArrowRight, Ship } from 'lucide-react';
+import { Navigation, Clock, ArrowRight, Ship } from 'lucide-react';
 import TradeMap from '../components/TradeMap';
 import API from '../config/api';
 
@@ -38,7 +38,7 @@ export default function RoutePlanner() {
   return (
     <>
       <div className="page-header">
-        <h2>🧭 Route Planner</h2>
+        <h2><Navigation size={28} className="header-icon" /> Route Planner</h2>
         <p>Interactive voyage planning with distance, sailing time, and port constraint analysis</p>
       </div>
 
